@@ -1,0 +1,243 @@
+<DOCTYPE html>
+    <html>
+        <head>
+            <title>Spending Tracker</title>
+            <meta charset="utf-8" />
+            <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+            <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        </head>
+        <body>
+            <div id="chartContainer" style="height: 370px; width: 40%;"></div>
+            <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+            <div id="app"></div>
+            <div>The rest of the page is not managed by Vue.js</div>
+            <style>
+                #chartContainer
+                {
+                    position: absolute;
+                    top:0%;
+                    left: 30%;
+                    width: 10px;
+                }
+                .v1 {
+                    border-left: 6px solid green;
+                    height: 950px;
+                    position: absolute;
+                    left: 30%;
+                    margin-left: -3px;
+                    top: 0;
+                }
+                .v2 {
+                    border-left: 6px solid green;
+                    height: 950px;
+                    position: absolute;
+                    left: 70%;
+                    margin-left: -3px;
+                    top: 0;
+                }
+                #fnumber{
+                    position: absolute;
+                    top: 20%;
+                    left: 2.5%;
+                }
+                #fnumberL{
+                    position: absolute;
+                    top:14%;
+                    left: 2.5%;
+                }
+                #fdate{
+                    position: absolute;
+                    top: 25%;
+                    left: 2.5%;
+                }
+                #fdateL{
+                    position: absolute;
+                    top:21%;
+                    left: 2.5%;
+                }
+                #spendDataTitle
+                {
+                    font-size: 40px;
+                    position: absolute;
+                    top: 2.5%;
+                    left: 2.5%;
+                }
+                
+                #fformL{
+                    position: absolute;
+                    top:26%;
+                    left: 2.5%;
+                }
+                #submitAmount{
+                    position: absolute;
+                    top:37.5%;
+                    left: 2.5%;
+                }
+                #radioE1
+                {
+                    position: absolute;
+                    top:30%;
+                    left: 2.5%;
+                }
+                #radioE2
+                {
+                    position: absolute;
+                    top:32%;
+                    left: 2.5%;
+                }
+                #radioE3
+                {
+                    position: absolute;
+                    top:34%;
+                    left: 2.5%;
+                }
+                #radioE1L
+                {
+                    position: absolute;
+                    top:30%;
+                    left: 4%;
+                }
+                #radioE2L
+                {
+                    position: absolute;
+                    top:32%;
+                    left: 4%;
+                }
+                #radioE3L
+                {
+                    position: absolute;
+                    top:34%;
+                    left: 4%;
+                }
+                iframe
+                {
+                    position: absolute;
+                    top:42%;
+                    left: 36.25%;
+                }
+            </style>
+            <div class="v1"></div>
+            <div class="v2"></div>
+            <h1 id = "spendDataTitle">Add Spend:</h1>
+            <p id = "fnumberL">Enter Cost:</p>
+            <form id = "amountForm">
+                <input type="number" name ="amountSpent" id="fnumber">
+                <input type="date" name ="spendDate" id="fdate">
+                <input type="radio" id="radioE1" name="spendType" value="Leisure">
+                <label for="radioE1" id = "radioE1L">Leisure</label><br>
+                <input type="radio" id="radioE2" name="spendType" value="Bills">
+                <label for="radioE2" id = "radioE2L">Bills</label><br>
+                <input type="radio" id="radioE3" name="spendType" value="Groceries">
+                <label for="radioE3" id = "radioE3L">Groceries</label><br>
+                <button type="submit" id = "submitAmount">Submit</button>
+            </form>
+            <iframe width="520" height="315" src="https://www.youtube.com/embed/tgbNymZ7vqY">
+            </iframe> 
+        </body>
+        <script type = "module">
+            //alert(`Vue.version = ${Vue.version}`);
+            console.log("axios.VERSION = " + axios.VERSION);
+            import Counter from "./counter.js";
+
+
+            var app = Vue.createApp({
+                components : {
+                    Counter:Counter
+                },
+                template : "<counter />",
+            });
+        
+            var vm = app.mount("div#app");
+            
+        </script>
+        <script>
+            let chart;
+            let count = 1;
+            window.onload = function () {
+                /*axios.fetch('/chartData')
+                    .then(response => response.json())
+                    .then(data => {
+                    const chartData = data.map(entry => ({ y: entry.value })); */
+                    chart = new CanvasJS.Chart("chartContainer", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    title:{
+                        text: "Last 7 Entries"
+                    },
+                    data: [{        
+                        type: "line",
+                        indexLabelFontSize: 16,
+                        dataPoints:  [
+                            { y: 450 },
+                            { y: 414},
+                            { y: 520, indexLabel: "\u2191 highest",markerColor: "red", markerType: "triangle" },
+                            { y: 460 },
+                            { y: 450 },
+                            { y: 410 , indexLabel: "\u2193 lowest",markerColor: "DarkSlateGrey", markerType: "cross" },
+                            { y: 550 }
+                        ]
+                        }]
+                    });
+                    chart.render();
+            }
+            const form = document.getElementById('amountForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const data = {};
+                formData.forEach((value, key) => (data[key] = value))
+
+                console.log(data);
+
+                axios.post('http://localhost:8080/addSpend', data)
+                .then(res => console.log(res))
+                .catch(err => console.log(err))
+                
+                
+                addData();
+            });
+            function addData()
+            {
+                console.log(document.getElementById('fnumber').value);
+                let latest = document.getElementById('fnumber').value;
+
+                if (chart && chart.data && chart.data[0] && chart.data[0].dataPoints) {
+                    chart.data[0].dataPoints[chart.data[0].dataPoints.length - count] = { y: parseInt(latest) };
+                    count++;
+                    if(count == 8)
+                    {
+                        count = 1;
+                    }
+                    console.log("Data points after update:", chart.data[0].dataPoints);
+                    chart.render();
+                    saveChartDataPoints();
+                    
+                }else {
+                    console.error("Chart or dataPoints not defined correctly");
+                }
+            }
+            function saveChartDataPoints() {
+                let dataPoints;
+                if (chart && chart.data && chart.data.length > 0 && chart.data[0].dataPoints) {
+                    dataPoints = chart.data[0].dataPoints;
+                    console.log("Data points:", dataPoints);
+                    // Now you can manipulate or save `dataPoints` as needed
+                    // Return dataPoints if needed for further processing
+                } else {    
+                    console.error("Chart or dataPoints not defined correctly");
+                    return null;
+                }
+                console.log("Hi");
+                console.log(dataPoints);
+                
+                axios.post('http://localhost:8080/saveDataPoints', {dataPoints})
+                .then(res => console.log(res))
+                .catch(err => console.log(err))
+            }
+        </script>
+        
+        <script>
+            
+        </script>
+</html>
