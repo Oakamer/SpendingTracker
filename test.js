@@ -11,12 +11,12 @@ const port = 8080;
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
-const uri = "mongodb+srv://u230351:cs230@cluster0.nuzoses.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+//const uri = "mongodb+srv://u230351:cs230@cluster0.nuzoses.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const url = 'mongodb://localhost:27017';
 const dbName = 'SpendDataBase';
 
-const client = new MongoClient(uri, {
+const client = new MongoClient(url, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
@@ -101,6 +101,29 @@ app.get('/chartData', function(req, res)
   });
 });
 
+const GetData = async function fetchLatestValues() {
+
+  try {
+      const database = client.db('SpendDataBase'); // Replace with your database name
+      const collection = database.collection('chartData'); // Replace with your collection name
+
+      // Step 2: Fetch the latest 7 documents
+      // Assuming each document has a field named 'timestamp' indicating when it was added
+      const latestDocuments = await collection.find().sort({ _id: -1 }).limit(7).toArray();
+
+      // Step 3: Save the results to a variable
+      const latestValues = latestDocuments;
+
+      // Optional: Print the latest values
+      console.log(latestValues);
+
+      return "Hello World";
+  } catch (error) {
+      console.error(error);
+  } finally {
+      //await //client.close();
+  }
+}
 
 
 

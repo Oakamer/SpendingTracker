@@ -179,6 +179,7 @@
                         }]
                     });
                     chart.render();
+                    //fetchLatestValues();
             }
             const form = document.getElementById('amountForm');
             form.addEventListener('submit', function(e) {
@@ -216,6 +217,7 @@
                 }else {
                     console.error("Chart or dataPoints not defined correctly");
                 }
+
             }
             function saveChartDataPoints() {
                 let dataPoints;
@@ -237,7 +239,14 @@
             }
         </script>
         
-        <script>
-            
+        <script type = "module">
+            import GetData from './test.js';
+
+            async function fetchAndAlert() {
+                let val = await fetchLatestValues();
+                alert(JSON.stringify(val));
+            }
+
+            fetchAndAlert();
         </script>
 </html>
