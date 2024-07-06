@@ -179,6 +179,7 @@
                         }]
                     });
                     chart.render();
+                    fetchAndAlert();
                     //fetchLatestValues();
             }
             const form = document.getElementById('amountForm');
@@ -239,14 +240,22 @@
             }
         </script>
         
-        <script type = "module">
-            import GetData from './test.js';
+        <script>
+            
 
             async function fetchAndAlert() {
-                let val = await fetchLatestValues();
-                alert(JSON.stringify(val));
+                console.log("Hiiiiiiii");
+                try {
+                    const response = await axios.get('http://localhost:8080/chartData');
+                    console.log('Full response:', response);
+                    const allValues = response.data; // Assuming the response is an array of values
+                    console.log(allValues);
+                    const latest7Values = allValues.slice(-7); // Get the last 7 values
+                    console.log(latest7Values);
+                } catch (error) {
+                    console.error('Error fetching data:', error.message);
+                }
             }
 
-            fetchAndAlert();
         </script>
 </html>

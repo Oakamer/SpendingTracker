@@ -89,14 +89,31 @@ app.post("/saveDataPoints", async(req, res) => {
     }
 });
 
-app.get('/chartData', function(req, res)
+/*app.get('/chartData', function(req, res)
 {
-  console.log("zzzzzz");
-  db.collection('chartData').find().sort({ createdAt: -1 }).limit(7).toArray(function(err, docs) {
+  //console.log("zzzzzz");
+  db.collection('chartData').find({}, function(err, docs) {
+    console.log("zzzzzz");
     if (err) {
       console.error('Error retrieving data from MongoDB:', err);
       return res.status(500).json({ error: 'Failed to retrieve data from MongoDB' });
     }
+    console.log('Data retrieved:', docs);
+    res.json(docs);
+  });
+});*/
+
+app.get('/chartData', (req, res) => {
+  res.send("GET request to /addChart received");
+  //console.log("zzzzzz");
+  db.collection('chartData').find({}, function(err, docs) {
+    console.log("zzzzzz");
+    if (err) {
+      console.error('Error retrieving data from MongoDB:', err);
+      return res.status(500).json({ error: 'Failed to retrieve data from MongoDB' });
+    }
+    console.log('Data retrieved:', docs);
+    res.send(docs);
     res.json(docs);
   });
 });
