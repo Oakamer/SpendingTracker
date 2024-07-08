@@ -103,19 +103,19 @@ app.post("/saveDataPoints", async(req, res) => {
   });
 });*/
 
-app.get('/chartData', (req, res) => {
-  res.send("GET request to /addChart received");
-  //console.log("zzzzzz");
-  db.collection('chartData').find({}, function(err, docs) {
-    console.log("zzzzzz");
-    if (err) {
-      console.error('Error retrieving data from MongoDB:', err);
-      return res.status(500).json({ error: 'Failed to retrieve data from MongoDB' });
+app.get('/getChartData', async (req, res) => {
+  try {
+    const dataPoints = await db.collection('chartData').find().toArray();
+    
+    if (dataPoints.length > 0) {
+      res.status(200).send(dataPoints);
+    } else {
+      res.status(404).send({ message: "No data found" });
     }
-    console.log('Data retrieved:', docs);
-    res.send(docs);
-    res.json(docs);
-  });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).send({ message: "An error occurred", error });
+  }
 });
 
 const GetData = async function fetchLatestValues() {
