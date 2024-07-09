@@ -131,7 +131,7 @@
                 <label for="radioE3" id = "radioE3L">Groceries</label><br>
                 <button type="submit" id = "submitAmount">Submit</button>
             </form>
-            
+            <button id = "reload" onclick = "fetchAndAlert()">Submit</button>
             </iframe> 
         </body>
         <script type = "module">
@@ -237,20 +237,43 @@
                 .then(res => console.log(res))
                 .catch(err => console.log(err))
             }
+            function fetchAndAlert() {
+                axios.get('http://localhost:8080/getChartData')
+                .then(response => {
+                    console.log(response.data);
+                    const valueArray = response.data.map(entry => entry.y)
+                    console.log(valueArray);
+
+                    if (valueArray.length >= 7) {
+                    for (var i = 0; i < 7; i++) {
+                        var latest = valueArray[valueArray.length - 1 - i];
+                        console.log(latest);
+                        chart.data[0].dataPoints[chart.data[0].dataPoints.length - 1 - i] = { y: parseInt(latest) };
+                    }
+                    chart.render();
+                    } else {
+                        console.error("valueArray does not contain at least 7 elements.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+
+                
+                /*for(var i = 0; i < 6; i++)
+                {
+                    var latest = valueArray[i];
+                    chart.data[0].dataPoints[chart.data[0].dataPoints.length - i] = { y: parseInt(latest) };
+                    chart.render()
+                }*/
+                
+            }
         </script>
         
         <script>
             
 
-            async function fetchAndAlert() {
-                axios.get('http://localhost:3000/fetchDataPoints')
-                .then(response => {
-                    console.log(response.data);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-            }
+            
 
         </script>
 </html>

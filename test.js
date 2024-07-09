@@ -105,7 +105,7 @@ app.post("/saveDataPoints", async(req, res) => {
 
 app.get('/getChartData', async (req, res) => {
   try {
-    const dataPoints = await db.collection('chartData').find().toArray();
+    const dataPoints = await db.collection('chartData').find().sort({ _id: -1 }).limit(7).toArray();
     
     if (dataPoints.length > 0) {
       res.status(200).send(dataPoints);
